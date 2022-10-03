@@ -1,16 +1,13 @@
 /* Question 1: Which countries have the most Invoices?*/
-
 SELECT billing_country,COUNT(billing_country) AS Invoice_Number
 FROM invoice
 GROUP BY billing_country
 ORDER BY Invoice_Number DESC;
 
-
 /* Question 2: Which city has the best customers? 
 We would like to throw a promotional Music Festival in the city we made the most money. 
 Write a query that returns the 1 city that has the highest sum of invoice totals. 
 Return both the city name and the sum of all invoice totals.*/
-
 SELECT billing_city,SUM(total) AS InvoiceTotal
 FROM invoice
 GROUP BY billing_city
@@ -21,7 +18,6 @@ LIMIT 1;
 The customer who has spent the most money will be declared the best customer. 
 Build a query that returns the person who has spent the most money. 
 Invoice, InvoiceLine, and Customer tables to retrieve this information*/
-
 SELECT customer.customer_id, first_name, last_name, SUM(total) AS total_spending
 FROM customer
 JOIN invoice ON customer.customer_id = invoice.customer_id
@@ -29,12 +25,11 @@ GROUP BY (customer.customer_id)
 ORDER BY total_spending DESC
 LIMIT 1;
 
-/***** 06. SQL: Question Set 2 *****/
+/**06. SQL: Question Set 2 *****/
 
 /*Question 1:
 Use your query to return the email, first name, last name, and Genre of all Rock Music listeners.
 Return your list ordered alphabetically by email address starting with A.*/
-
 /*Sol 1:*/
 SELECT DISTINCT email,first_name, last_name
 FROM customer
@@ -62,7 +57,6 @@ ORDER BY email;
 Now that we know that our customers love rock music, we can decide which musicians to invite to play at the concert.
 Let's invite the artists who have written the most rock music in our dataset. 
 Write a query that returns the Artist name and total track count of the top 10 rock bands.*/
-
 SELECT artist.artist_id, artist.name,COUNT(artist.artist_id) AS number_of_songs
 FROM track
 JOIN album ON album.album_id = track.album_id
@@ -81,7 +75,6 @@ For this query, you will need to use the Invoice, InvoiceLine, Track, Customer, 
 Notice, this one is tricky because the Total spent in the Invoice table might not be on a single product, 
 so you need to use the InvoiceLine table to find out how many of each product was purchased, 
 and then multiply this by the price for each artist.*/
-
 WITH tbl_best_selling_artist AS(
 	SELECT artist.artist_id AS artist_id,artist.name AS artist_name,SUM(invoiceline.unit_price*invoiceline.quantity) AS total_sales
 	FROM invoiceline
@@ -112,7 +105,6 @@ We want to find out the most popular music Genre for each country.
 We determine the most popular genre as the genre with the highest amount of purchases. 
 Write a query that returns each country along with the top Genre. 
 For countries where the maximum number of purchases is shared return all Genres.*/
-
 /*sales for each country*/
 SELECT COUNT(*) AS purchases_per_genre, customer.country, genre.name, genre.genre_id
 FROM invoiceline
@@ -131,7 +123,8 @@ ORDER BY 2;
 
 /*** Final ***/
 WITH RECURSIVE
-	tbl_sales_per_country AS(
+	tbl_sales_per_country AS
+		(
 		SELECT COUNT(*) AS purchases_per_genre, customer.country, genre.name, genre.genre_id
 		FROM invoiceline
 		JOIN invoice ON invoice.invoice_id = invoiceline.invoice_id
@@ -140,7 +133,7 @@ WITH RECURSIVE
 		JOIN genre ON genre.genre_id = track.genre_id
 		GROUP BY 2,3,4
 		ORDER BY 2
-	)
+		)
 	,tbl_max_genre_per_country AS(SELECT MAX(purchases_per_genre) AS max_genre_number, country
 		FROM tbl_sales_per_country
 		GROUP BY 2
